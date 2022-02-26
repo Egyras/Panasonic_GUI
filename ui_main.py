@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'GUI_BASEuKVLjW.ui'
+## Form generated from reading UI file 'GUI_BASEpHtSIX.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
@@ -774,7 +774,7 @@ class Ui_MainWindow(object):
         self.circularContainer_1.raise_()
         self.frame_div_render_time = QFrame(self.HomeFrame)
         self.frame_div_render_time.setObjectName(u"frame_div_render_time")
-        self.frame_div_render_time.setGeometry(QRect(550, 30, 341, 561))
+        self.frame_div_render_time.setGeometry(QRect(550, 20, 341, 561))
         self.frame_div_render_time.setMinimumSize(QSize(0, 160))
         self.frame_div_render_time.setStyleSheet(u"border-radius: 5px;")
         self.frame_div_render_time.setFrameShape(QFrame.StyledPanel)
@@ -816,7 +816,7 @@ class Ui_MainWindow(object):
         self.label_inlet_tempV.setAlignment(Qt.AlignCenter)
         self.label_flow_raten = QLabel(self.frame_div_render_time)
         self.label_flow_raten.setObjectName(u"label_flow_raten")
-        self.label_flow_raten.setGeometry(QRect(0, 100, 174, 16))
+        self.label_flow_raten.setGeometry(QRect(0, 300, 174, 16))
         self.label_flow_raten.setMaximumSize(QSize(16777215, 20))
         self.label_flow_raten.setFont(font4)
         self.label_flow_raten.setStyleSheet(u"")
@@ -824,7 +824,7 @@ class Ui_MainWindow(object):
         self.label_flow_raten.setAlignment(Qt.AlignCenter)
         self.label_flow_rateV = QLabel(self.frame_div_render_time)
         self.label_flow_rateV.setObjectName(u"label_flow_rateV")
-        self.label_flow_rateV.setGeometry(QRect(10, 120, 181, 51))
+        self.label_flow_rateV.setGeometry(QRect(10, 320, 181, 51))
         self.label_flow_rateV.setFont(font5)
         self.label_flow_rateV.setStyleSheet(u"color: rgb(115, 185, 255); padding: 0px; background-color: none;")
         self.label_flow_rateV.setAlignment(Qt.AlignCenter)
@@ -856,6 +856,34 @@ class Ui_MainWindow(object):
         self.label_mode_selectedV.setFont(font5)
         self.label_mode_selectedV.setStyleSheet(u"color: rgb(115, 185, 255); padding: 0px; background-color: none;")
         self.label_mode_selectedV.setAlignment(Qt.AlignCenter)
+        self.label_defrostn = QLabel(self.frame_div_render_time)
+        self.label_defrostn.setObjectName(u"label_defrostn")
+        self.label_defrostn.setGeometry(QRect(0, 100, 173, 17))
+        self.label_defrostn.setMaximumSize(QSize(16777215, 20))
+        self.label_defrostn.setFont(font4)
+        self.label_defrostn.setStyleSheet(u"")
+        self.label_defrostn.setLineWidth(1)
+        self.label_defrostn.setAlignment(Qt.AlignCenter)
+        self.label_defrostv = QLabel(self.frame_div_render_time)
+        self.label_defrostv.setObjectName(u"label_defrostv")
+        self.label_defrostv.setGeometry(QRect(0, 120, 174, 51))
+        self.label_defrostv.setFont(font5)
+        self.label_defrostv.setStyleSheet(u"color: rgb(115, 185, 255); padding: 0px; background-color: none;")
+        self.label_defrostv.setAlignment(Qt.AlignCenter)
+        self.label_inlet_tempn_2 = QLabel(self.frame_div_render_time)
+        self.label_inlet_tempn_2.setObjectName(u"label_inlet_tempn_2")
+        self.label_inlet_tempn_2.setGeometry(QRect(160, 300, 173, 17))
+        self.label_inlet_tempn_2.setMaximumSize(QSize(16777215, 20))
+        self.label_inlet_tempn_2.setFont(font4)
+        self.label_inlet_tempn_2.setStyleSheet(u"")
+        self.label_inlet_tempn_2.setLineWidth(1)
+        self.label_inlet_tempn_2.setAlignment(Qt.AlignCenter)
+        self.label_target_tempV = QLabel(self.frame_div_render_time)
+        self.label_target_tempV.setObjectName(u"label_target_tempV")
+        self.label_target_tempV.setGeometry(QRect(160, 320, 174, 51))
+        self.label_target_tempV.setFont(font5)
+        self.label_target_tempV.setStyleSheet(u"color: rgb(115, 185, 255); padding: 0px; background-color: none;")
+        self.label_target_tempV.setAlignment(Qt.AlignCenter)
         self.gridLayoutWidget_5 = QWidget(self.HomeFrame)
         self.gridLayoutWidget_5.setObjectName(u"gridLayoutWidget_5")
         self.gridLayoutWidget_5.setGeometry(QRect(40, 300, 144, 81))
@@ -869,6 +897,20 @@ class Ui_MainWindow(object):
         self.labelAplicationName_4.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_button.addWidget(self.labelAplicationName_4, 0, 0, 1, 1)
+
+        self.gridLayoutWidget_7 = QWidget(self.HomeFrame)
+        self.gridLayoutWidget_7.setObjectName(u"gridLayoutWidget_7")
+        self.gridLayoutWidget_7.setGeometry(QRect(40, 390, 151, 81))
+        self.gridLayout_button_2 = QGridLayout(self.gridLayoutWidget_7)
+        self.gridLayout_button_2.setObjectName(u"gridLayout_button_2")
+        self.gridLayout_button_2.setContentsMargins(0, 0, 0, 0)
+        self.labelAplicationName_5 = QLabel(self.gridLayoutWidget_7)
+        self.labelAplicationName_5.setObjectName(u"labelAplicationName_5")
+        self.labelAplicationName_5.setFont(font2)
+        self.labelAplicationName_5.setStyleSheet(u"color: #FFFFFF; background-color: none;")
+        self.labelAplicationName_5.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_button_2.addWidget(self.labelAplicationName_5, 0, 0, 1, 1)
 
 
         self.verticalLayout_10.addWidget(self.HomeFrame)
@@ -1183,7 +1225,12 @@ class Ui_MainWindow(object):
         self.label_3way_valveV.setText(QCoreApplication.translate("MainWindow", u"<p align=\"center\"><span style=\" font-size:25pt;\">Floor</span>", None))
         self.label_mode_selectedn.setText(QCoreApplication.translate("MainWindow", u"<strong>Heating</strong> Mode", None))
         self.label_mode_selectedV.setText(QCoreApplication.translate("MainWindow", u"<p align=\"center\"><span style=\" font-size:25pt;\">Floor</span>", None))
+        self.label_defrostn.setText(QCoreApplication.translate("MainWindow", u"<strong>Defrosting</strong> Stage", None))
+        self.label_defrostv.setText(QCoreApplication.translate("MainWindow", u"<p align=\"center\"><span style=\" font-size:25pt;\">OFF</span>", None))
+        self.label_inlet_tempn_2.setText(QCoreApplication.translate("MainWindow", u"<strong>Target</strong> Temperature", None))
+        self.label_target_tempV.setText(QCoreApplication.translate("MainWindow", u"<p align=\"center\"><span style=\" font-size:30pt;\">0</span><span style=\" font-size:15pt; vertical-align:super;\">\u00b0C</span></p>", None))
         self.labelAplicationName_4.setText(QCoreApplication.translate("MainWindow", u"<strong>Enable</strong> QuietMode", None))
+        self.labelAplicationName_5.setText(QCoreApplication.translate("MainWindow", u"<strong>Enable</strong> PowerMode", None))
         ___qtablewidgetitem = self.tableWidget_data.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Topic", None));
         ___qtablewidgetitem1 = self.tableWidget_data.horizontalHeaderItem(1)

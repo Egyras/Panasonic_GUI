@@ -1,27 +1,14 @@
 import sys
-import platform
-import os
-
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import (QCoreApplication, QPropertyAnimation, QDate, QDateTime, QMetaObject, QObject, QPoint, QRect,
                             QSize, QTime, QUrl, Qt, QEvent, QTimer, QThread, Slot, Signal, QRegExp)
 from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont, QFontDatabase, QIcon, QKeySequence,
                            QLinearGradient, QPalette, QPainter, QPixmap, QRadialGradient, QRegExpValidator)
 from PySide2.QtWidgets import *
-# from PySide2.QtCore import QThread, Slot, Signal
-import PySide2
 import pyqtgraph as pg
-# from pyqtgraph import PlotWidget
-# from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
-# from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 import json
 import requests
-# import matplotlib
-import numpy as np
-# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-# import matplotlib.pyplot as plt
-
-# matplotlib.use("Qt5Agg")
+from queue import Queue, Empty
 
 # GUI FILE
 from ui_main import Ui_MainWindow
@@ -32,32 +19,30 @@ from ui_functions import *
 from py_toggle import PyToggle
 
 global IP
-global update
 
 
 class WorkerThread(QThread):
-    measurements_signals = Signal(int, int, str, dict, str, str, float, str, str, str, name = 'm_signals')  # declare the signal
+    measurements_signals = Signal(int, int, str, dict, str, str, float,
+                                  str, str, str, int, int, int, int, str, str, name = 'm_signals')  # declare the signal
 
     def __init__(self, parent=None):
         QThread.__init__(self)
-        # super(WorkerThread, self).__init__(parent)
-        self.timer = QTimer()
-        self.timer.timeout.connect(lambda: WorkerThread.run(self))
-        self.timer.setInterval(6000)  # 5000ms = 5s
-        self.timer.start()
-        # iTime = int(5000)
+        self.queue = Queue()
 
     def run(self):
-        print(IP)
-        # url = "http://192.168.8.150/json"
-        url = f"http://{IP}/json"
-        try:
-            res = requests.get(url)
-            msg = res.json()
-            print(msg)
+        self.keepRunning = True
+        # url = "http://192.168.8.150/"
+        url = f"http://{IP}/"
+        quiet = None
+
+        while self.keepRunning:
             try:
+                res = requests.get(url + 'json')
+                msg = res.json()
+                print(msg)
                 if res.status_code == 200:
                     hzPower = msg["heatpump"][8]["Value"]
+                    TatgetTemp = msg["heatpump"][7]["Value"]
                     wOutTemp = msg["heatpump"][6]["Value"]
                     status = "Connected"
                     allData = msg
@@ -65,21 +50,45 @@ class WorkerThread(QThread):
                     inletTemp = msg["heatpump"][5]["Value"]
                     wflow = msg["heatpump"][1]["Value"]
                     valve3w = msg["heatpump"][20]["Description"]
-                    quiet = msg["heatpump"][18]["Value"]
                     mode = msg["heatpump"][4]["Description"]
-                    self.measurements_signals.emit(int(hzPower), int(wOutTemp), status, allData, TankTemp, inletTemp,
-                                                   float(wflow), valve3w, quiet, mode)
+                    curveOutHigh = msg["heatpump"][31]["Value"]
+                    curveOutLow = msg["heatpump"][32]["Value"]
+                    curveInHigh = msg["heatpump"][29]["Value"]
+                    curveInLow = msg["heatpump"][30]["Value"]
+                    defrost = msg["heatpump"][26]["Description"]
+                    new = msg["heatpump"][18]["Value"]
+                    if new != quiet:
+                        quiet = new
+                        self.measurements_signals.emit(int(hzPower), int(wOutTemp), status, allData, TankTemp,
+                                                       inletTemp,
+                                                       float(wflow), valve3w, quiet, mode, int(curveOutHigh),
+                                                       int(curveOutLow), int(curveInHigh), int(curveInLow), defrost,
+                                                       TatgetTemp)
+
                 else:
                     print("Not Working")
-            except requests.exceptions as err:
+
+            except requests.exceptions.InvalidURL or requests.exceptions.ConnectionError as err:
                 print(err)
 
-        except requests.exceptions.ConnectionError as err:
-            print(err)
+            try:
+                q = self.queue.get(timeout = 6)
+                if q == -1:
+                    break
+                cmd, value = q
+                requests.request('GET', f'{url}command?{cmd}={value}')
+
+            except Empty:
+                pass
 
     def stop(self):
-        self.terminate()
         print("stop")
+        self.keepRunning = False
+        self.queue.put(-1)
+        self.wait()
+
+    def setQuiet(self, state):
+        self.queue.put(('SetQuietMode', int(state)))
 
 
 class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainWindow
@@ -101,7 +110,7 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         UIFunctions.labelTitle(self, "Panasonic Aquarea Control")
 
         # WINDOW SIZE ==> DEFAULT SIZE
-        startSize = QSize(1150, 800)
+        startSize = QSize(1200, 800)
         self.resize(startSize)
         self.setMinimumSize(startSize)
         # UIFunctions.enableMaximumSize(self, 500, 720)
@@ -151,8 +160,7 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
 
         self.toggle = PyToggle()
         self.ui.gridLayout_button.addWidget(self.toggle)
-        self.toggle.stateChanged.connect(self.postCommand)
-        # status = self.toggle.isChecked()
+
 
         # ==> IP TEXT FIELD VALIDATOR WITH INPUT MASK
 
@@ -165,14 +173,11 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         # ==> ADVANCED MENU FIRST PYTHOGRAPH VIEW
 
         self.graphWidget = self.ui.graphicsView
-        hour = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        temperature = [30, 32, 34, 32, 33, 31, 29, 32, 35, 25]
         self.graphWidget.setBackground((27, 29, 35))
-        self.graphWidget.plot(hour, temperature)
-        self.graphWidget.setTitle("<span style=\"color:white;font-size:10pt\">Temperatures</span>")
-        self.graphWidget.setLabel('left', "<span style=\"color:white;font-size:10px\">Temperature (°C)</span>")
-        self.graphWidget.setLabel('bottom', "<span style=\"color:white;font-size:10px\">Hour (H)</span>")
-        self.graphWidget.plot(hour, temperature)
+        self.graphWidget.setTitle("<span style=\"color:white;font-size:10pt\">Heating Curve</span>")
+        self.graphWidget.setLabel('left', "<span style=\"color:white;font-size:12px\">Water Temperature (°C)</span>")
+        self.graphWidget.setLabel('bottom',
+                                  "<span style=\"color:white;font-size:12px\">Outside Temperature (°C)</span>")
 
         # ==> ADD IP TO FILE
         self.ui.pushButton_add_render.clicked.connect(self.addIP)
@@ -215,12 +220,15 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         # ==> Worker Thread start
 
         self.wt = WorkerThread()  # This is the thread object
-        self.wt.start()
         # Connect the signal from the thread to the slot_method
-        self.wt.measurements_signals.connect(self.slot_method)  ### 3) connect to the slot
+        self.wt.measurements_signals.connect(self.slot_method)
         app.aboutToQuit.connect(self.wt.stop)  # to stop the thread when closing the GUI
+        self.toggle.toggled.connect(self.wt.setQuiet)
+        # it's usually better to start the thread *after* connecting signals
+        self.wt.start()
 
-    def slot_method(self, hz, wouttemp, stat, allData, tanktemp, inltemp, wflow, valve3, quiet, mode):
+    def slot_method(self, hz, wouttemp, stat, allData, tanktemp, inltemp, wflow, valve3, quiet, mode, curveOutHigh,
+                    curveOutLow, curveInHigh, curveInLow, defrost, TatgetTemp):
 
         htmlTextHz = """<p align="center"><span style=" font-size:30pt;">{VALUE}</span><span style=" font-size:20pt; vertical-align:super;">Hz</span></p>"""
 
@@ -234,7 +242,7 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         styleSheetHz = """
                         QFrame{
                         border-radius: 110px;
-                        background-color: qconicalgradient(cx:0.5, cy:0.5, angle:90, stop:{STOP_1} rgba(85, 255, 127, 255), stop:{STOP_2} rgba(255, 255, 255, 0));
+                        background-color: qconicalgradient(cx:0.5, cy:0.5, angle:-90, stop:{STOP_1} rgba(85, 255, 127, 255), stop:{STOP_2} rgba(255, 255, 255, 0));
                         }
                     """
 
@@ -269,6 +277,10 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         newHtmlInletTemp = htmlTextLabels.replace("{VALUE}", inltemp)
         self.ui.label_inlet_tempV.setText(newHtmlInletTemp)
 
+        # TARGET TEMP LABEL
+        newHtmlTarget = htmlTextLabels.replace("{VALUE}", TatgetTemp)
+        self.ui.label_target_tempV.setText(newHtmlTarget)
+
         # WATER FLOW LABEL
         htmlTextLabelsFlow = """<p align="center"><span style=" font-size:25pt;">{VALUE}</span><span style=" font-size:15pt; vertical-align:super;">l/min</span></p>"""
         newHtmlWaterFlow = htmlTextLabelsFlow.replace("{VALUE}", str(wflow))
@@ -276,12 +288,15 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
 
         # 3 WAY VALVE LABEL
         htmlTextLabels3way = """<p align="center"><span style=" font-size:25pt;">{VALUE}</span>"""
-        newHtml3wayValve = htmlTextLabels3way.replace("{VALUE}", str(valve3))
+        newHtml3wayValve = htmlTextLabels3way.replace("{VALUE}", valve3)
         self.ui.label_3way_valveV.setText(newHtml3wayValve)
 
+        # DEFROST MODE LABEL
+        newHtmlDefrost = htmlTextLabels3way.replace("{VALUE}", defrost)
+        self.ui.label_defrostv.setText(newHtmlDefrost)
+
         # MODE LABEL
-        htmlTextLabelMode = """<p align="center"><span style=" font-size:25pt;">{VALUE}</span>"""
-        newHtmlMode = htmlTextLabelMode.replace("{VALUE}", mode)
+        newHtmlMode = htmlTextLabels3way.replace("{VALUE}", mode)
         self.ui.label_mode_selectedV.setText(newHtmlMode)
 
         # TABLE UPDATE IN ADVANCED PAGE
@@ -300,21 +315,15 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         # QUIET BUTTON STATE UPDATE
 
         if quiet == "1":
+            # temporarily disconnect to avoid calling setQuiet unnecessarily
+            self.toggle.toggled.disconnect(self.wt.setQuiet)
             self.toggle.setChecked(True)
+            self.toggle.toggled.connect(self.wt.setQuiet)
 
-        # CREATE pyqtSlot FOR BETTER GUI HANDLING
+        # UPDATE PLOT
+        self.plotGraph(curveOutHigh, curveOutLow, curveInHigh, curveInLow)
 
-    @Slot()
-    def findName(self):
-        name = self.ui.lineEdit_search.text().lower()
-        for row in range(self.ui.tableWidget_data.rowCount()):
-            item = self.ui.tableWidget_data.item(row, 1)
-            # if the search text is not in the item's text do not hide the row #
-            self.ui.tableWidget_data.setRowHidden(row, name not in item.text().lower())
-
-    @Slot()
     def postCommand(self):
-        print(f"Status: {self.toggle.isChecked()}")
         if self.toggle.isChecked():
             setting = "SetQuietMode=1"
         else:
@@ -322,19 +331,28 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
 
         url = f"http://192.168.8.150/command?{setting}"
         r = requests.request('GET', url)
-        # WorkerThread.updateInterval(int(8000))
-        print(r)
-        print(url)
 
-    @Slot()
+    def findName(self):
+        name = self.ui.lineEdit_search.text().lower()
+        for row in range(self.ui.tableWidget_data.rowCount()):
+            item = self.ui.tableWidget_data.item(row, 1)
+            # if the search text is not in the item's text do not hide the row #
+            self.ui.tableWidget_data.setRowHidden(row, name not in item.text().lower())
+
     def onChanged(self, text):
         global IP
         IP = text
 
     def addIP(self):
-        ip = self.ui.label_ip.text()
-        print(ip)
+        ip = self.ui.lineEdit_description.text()
         if ip != "":
+            msg = QMessageBox()
+            msg.setStyleSheet(
+                'QMessageBox {background-color: #272c36; font-size: 10pt; color: #ffffff;}\nQPushButton{color: white; font-size: 15px; background-color: #1d1d1d; border-radius: 5px; padding: 10px; text-align: center;}\n QPushButton:hover{color: #2b5b84;}')
+            msg.setIcon(QtWidgets.QMessageBox.Information)
+            msg.setWindowTitle("+Add API")
+            msg.setText("<font color=\"White\">IP was added")
+            msg.exec()
             with open("IPSave.txt", "w") as CurrentFile:
                 CurrentFile.write(str(ip))
         else:
@@ -348,9 +366,10 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
                 data = f.read()
                 self.ui.lineEdit_description.setText(data)
 
-    # UPDATE TIMER FOR BETTER SYNC IF VALUE CHANGED
-    # def updateTimeronChange(self, value):
-    # WorkerThread.updateInterval(Signal, value)
+    def plotGraph(self, temp1, temp2, temp3, temp4):
+        tempwater = [temp3, temp4]
+        tempoutside = [temp2, temp1]
+        self.graphWidget.plot(tempoutside, tempwater)
 
     # MENUS ==> DYNAMIC MENUS FUNCTIONS
 

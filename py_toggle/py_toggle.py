@@ -29,7 +29,7 @@ class PyToggle(QCheckBox):
         self._circle_position = 3
         self.animation = QPropertyAnimation(self, b"circle_position", self)
         self.animation.setEasingCurve(animation_curve)
-        self.animation.setDuration(500)  # Time in milliseconds
+        self.animation.setDuration(400)  # Time in milliseconds
 
         # CONNECT STATE CHANGED
 

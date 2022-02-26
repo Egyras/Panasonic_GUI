@@ -1755,7 +1755,7 @@ QPushButton:pressed {
                        <property name="geometry">
                         <rect>
                          <x>550</x>
-                         <y>30</y>
+                         <y>20</y>
                          <width>341</width>
                          <height>561</height>
                         </rect>
@@ -1899,7 +1899,7 @@ QPushButton:pressed {
                         <property name="geometry">
                          <rect>
                           <x>0</x>
-                          <y>100</y>
+                          <y>300</y>
                           <width>174</width>
                           <height>16</height>
                          </rect>
@@ -1932,7 +1932,7 @@ QPushButton:pressed {
                         <property name="geometry">
                          <rect>
                           <x>10</x>
-                          <y>120</y>
+                          <y>320</y>
                           <width>181</width>
                           <height>51</height>
                          </rect>
@@ -2075,6 +2075,126 @@ QPushButton:pressed {
                          <set>Qt::AlignCenter</set>
                         </property>
                        </widget>
+                       <widget class="QLabel" name="label_defrostn">
+                        <property name="geometry">
+                         <rect>
+                          <x>0</x>
+                          <y>100</y>
+                          <width>173</width>
+                          <height>17</height>
+                         </rect>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Segoe UI</family>
+                         </font>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="lineWidth">
+                         <number>1</number>
+                        </property>
+                        <property name="text">
+                         <string>&lt;strong&gt;Defrosting&lt;/strong&gt; Stage</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                       <widget class="QLabel" name="label_defrostv">
+                        <property name="geometry">
+                         <rect>
+                          <x>0</x>
+                          <y>120</y>
+                          <width>174</width>
+                          <height>51</height>
+                         </rect>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>25</pointsize>
+                          <weight>50</weight>
+                          <bold>false</bold>
+                         </font>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">color: rgb(115, 185, 255); padding: 0px; background-color: none;</string>
+                        </property>
+                        <property name="text">
+                         <string>&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:25pt;&quot;&gt;OFF&lt;/span&gt;</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                       <widget class="QLabel" name="label_inlet_tempn_2">
+                        <property name="geometry">
+                         <rect>
+                          <x>160</x>
+                          <y>300</y>
+                          <width>173</width>
+                          <height>17</height>
+                         </rect>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Segoe UI</family>
+                         </font>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="lineWidth">
+                         <number>1</number>
+                        </property>
+                        <property name="text">
+                         <string>&lt;strong&gt;Target&lt;/strong&gt; Temperature</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                       <widget class="QLabel" name="label_target_tempV">
+                        <property name="geometry">
+                         <rect>
+                          <x>160</x>
+                          <y>320</y>
+                          <width>174</width>
+                          <height>51</height>
+                         </rect>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>25</pointsize>
+                          <weight>50</weight>
+                          <bold>false</bold>
+                         </font>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">color: rgb(115, 185, 255); padding: 0px; background-color: none;</string>
+                        </property>
+                        <property name="text">
+                         <string>&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:30pt;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot; font-size:15pt; vertical-align:super;&quot;&gt;°C&lt;/span&gt;&lt;/p&gt;</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
                       </widget>
                       <widget class="QWidget" name="gridLayoutWidget_5">
                        <property name="geometry">
@@ -2098,6 +2218,36 @@ QPushButton:pressed {
                           </property>
                           <property name="text">
                            <string>&lt;strong&gt;Enable&lt;/strong&gt; QuietMode</string>
+                          </property>
+                          <property name="alignment">
+                           <set>Qt::AlignCenter</set>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="gridLayoutWidget_7">
+                       <property name="geometry">
+                        <rect>
+                         <x>40</x>
+                         <y>390</y>
+                         <width>151</width>
+                         <height>81</height>
+                        </rect>
+                       </property>
+                       <layout class="QGridLayout" name="gridLayout_button_2">
+                        <item row="0" column="0">
+                         <widget class="QLabel" name="labelAplicationName_5">
+                          <property name="font">
+                           <font>
+                            <pointsize>10</pointsize>
+                           </font>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">color: #FFFFFF; background-color: none;</string>
+                          </property>
+                          <property name="text">
+                           <string>&lt;strong&gt;Enable&lt;/strong&gt; PowerMode</string>
                           </property>
                           <property name="alignment">
                            <set>Qt::AlignCenter</set>
