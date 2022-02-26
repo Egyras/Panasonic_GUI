@@ -161,6 +161,11 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         self.toggle = PyToggle()
         self.ui.gridLayout_button.addWidget(self.toggle)
 
+        # ==> TOGGLE BUTTON 2
+
+        self.togglep = PyToggle()
+        self.ui.gridLayout_button_2.addWidget(self.togglep)
+
 
         # ==> IP TEXT FIELD VALIDATOR WITH INPUT MASK
 
