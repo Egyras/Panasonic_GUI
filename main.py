@@ -23,7 +23,8 @@ global IP
 
 class WorkerThread(QThread):
     measurements_signals = Signal(int, int, str, dict, str, str, float,
-                                  str, str, str, int, int, int, int, str, str, name = 'm_signals')  # declare the signal
+                                  str, str, int, int, int, int, str, str, name = 'm_signals')  # declare the signal
+    measurements_signals_control = Signal(str, str, name = 'control_signals')
 
     def __init__(self, parent=None):
         QThread.__init__(self)
@@ -56,14 +57,17 @@ class WorkerThread(QThread):
                     curveInHigh = msg["heatpump"][29]["Value"]
                     curveInLow = msg["heatpump"][30]["Value"]
                     defrost = msg["heatpump"][26]["Description"]
-                    new = msg["heatpump"][18]["Value"]
-                    if new != quiet:
-                        quiet = new
-                        self.measurements_signals.emit(int(hzPower), int(wOutTemp), status, allData, TankTemp,
-                                                       inletTemp,
-                                                       float(wflow), valve3w, quiet, mode, int(curveOutHigh),
-                                                       int(curveOutLow), int(curveInHigh), int(curveInLow), defrost,
-                                                       TatgetTemp)
+                    newquiet = msg["heatpump"][18]["Value"]
+                    newpower = msg["heatpump"][17]["Value"]
+                    if (newquiet or newpower) != quiet:
+                        quiet = newquiet
+                        power = newpower
+                        self.measurements_signals_control.emit(quiet, power)
+
+                    self.measurements_signals.emit(int(hzPower), int(wOutTemp), status, allData, TankTemp,
+                                                   inletTemp, float(wflow), valve3w, mode, int(curveOutHigh),
+                                                   int(curveOutLow), int(curveInHigh), int(curveInLow), defrost,
+                                                   TatgetTemp)
 
                 else:
                     print("Not Working")
@@ -88,7 +92,12 @@ class WorkerThread(QThread):
         self.wait()
 
     def setQuiet(self, state):
+        print(state)
         self.queue.put(('SetQuietMode', int(state)))
+
+    def setPower(self, state):
+        print(state)
+        self.queue.put(('SetPowerfulMode', int(state)))
 
 
 class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainWindow
@@ -161,11 +170,10 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         self.toggle = PyToggle()
         self.ui.gridLayout_button.addWidget(self.toggle)
 
-        # ==> TOGGLE BUTTON 2
+        # ==> TOGGLE BUTTON2
 
         self.togglep = PyToggle()
         self.ui.gridLayout_button_2.addWidget(self.togglep)
-
 
         # ==> IP TEXT FIELD VALIDATOR WITH INPUT MASK
 
@@ -227,12 +235,14 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         self.wt = WorkerThread()  # This is the thread object
         # Connect the signal from the thread to the slot_method
         self.wt.measurements_signals.connect(self.slot_method)
+        self.wt.measurements_signals_control.connect(self.slot_control)
         app.aboutToQuit.connect(self.wt.stop)  # to stop the thread when closing the GUI
         self.toggle.toggled.connect(self.wt.setQuiet)
+        self.togglep.toggled.connect(self.wt.setPower)
         # it's usually better to start the thread *after* connecting signals
         self.wt.start()
 
-    def slot_method(self, hz, wouttemp, stat, allData, tanktemp, inltemp, wflow, valve3, quiet, mode, curveOutHigh,
+    def slot_method(self, hz, wouttemp, stat, allData, tanktemp, inltemp, wflow, valve3, mode, curveOutHigh,
                     curveOutLow, curveInHigh, curveInLow, defrost, TatgetTemp):
 
         htmlTextHz = """<p align="center"><span style=" font-size:30pt;">{VALUE}</span><span style=" font-size:20pt; vertical-align:super;">Hz</span></p>"""
@@ -317,25 +327,21 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
                 w.setItem(row, column, it)
         self.ui.lineEdit_search.textChanged.connect(self.findName)  # Search field connector
 
-        # QUIET BUTTON STATE UPDATE
+        # UPDATE PLOT
+        self.plotGraph(curveOutHigh, curveOutLow, curveInHigh, curveInLow)
 
+    def slot_control(self, quiet, power):
+        # QUIET BUTTON STATE UPDATE
         if quiet == "1":
             # temporarily disconnect to avoid calling setQuiet unnecessarily
             self.toggle.toggled.disconnect(self.wt.setQuiet)
             self.toggle.setChecked(True)
             self.toggle.toggled.connect(self.wt.setQuiet)
+        if power == "1":
+            self.togglep.toggled.disconnect(self.wt.setPower)
+            self.togglep.setChecked(True)
+            self.togglep.toggled.connect(self.wt.setPower)
 
-        # UPDATE PLOT
-        self.plotGraph(curveOutHigh, curveOutLow, curveInHigh, curveInLow)
-
-    def postCommand(self):
-        if self.toggle.isChecked():
-            setting = "SetQuietMode=1"
-        else:
-            setting = "SetQuietMode=0"
-
-        url = f"http://192.168.8.150/command?{setting}"
-        r = requests.request('GET', url)
 
     def findName(self):
         name = self.ui.lineEdit_search.text().lower()
