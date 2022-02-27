@@ -40,7 +40,7 @@ class WorkerThread(QThread):
             try:
                 res = requests.get(url + 'json')
                 msg = res.json()
-                print(msg)
+                #print(msg)
                 if res.status_code == 200:
                     hzPower = msg["heatpump"][8]["Value"]
                     TatgetTemp = msg["heatpump"][7]["Value"]
@@ -114,7 +114,7 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
         # REMOVE ==> STANDARD TITLE BAR
         UIFunctions.removeTitleBar(True)
 
-        # SET ==> WINDOW TITLE AND ICON
+        # SET ==> WINDOW TITLE
         self.setWindowTitle("Panasonic Aquarea Control")
         UIFunctions.labelTitle(self, "Panasonic Aquarea Control")
 
