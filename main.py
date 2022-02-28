@@ -18,8 +18,6 @@ from ui_styles import Style
 from ui_functions import *
 from py_toggle import PyToggle
 
-global IP
-
 
 class WorkerThread(QThread):
     measurements_signals = Signal(int, int, str, dict, str, str, float,
@@ -40,7 +38,7 @@ class WorkerThread(QThread):
             try:
                 res = requests.get(url + 'json')
                 msg = res.json()
-                #print(msg)
+                # print(msg)
                 if res.status_code == 200:
                     hzPower = msg["heatpump"][8]["Value"]
                     TatgetTemp = msg["heatpump"][7]["Value"]
@@ -92,7 +90,6 @@ class WorkerThread(QThread):
         self.wait()
 
     def setQuiet(self, state):
-        print(state)
         self.queue.put(('SetQuietMode', int(state)))
 
     def setPower(self, state):
@@ -341,7 +338,6 @@ class MainWindow(QMainWindow):  # MainWindow class that inherits all from QMainW
             self.togglep.toggled.disconnect(self.wt.setPower)
             self.togglep.setChecked(True)
             self.togglep.toggled.connect(self.wt.setPower)
-
 
     def findName(self):
         name = self.ui.lineEdit_search.text().lower()

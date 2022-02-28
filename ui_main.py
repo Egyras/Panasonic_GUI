@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'GUI_BASEpHtSIX.ui'
+## Form generated from reading UI file 'GUI_BASElsUPua.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
