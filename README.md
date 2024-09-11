@@ -1,4 +1,4 @@
-# Panasonic GUI to control Panasonic Aquarea air-water pump
+# Panasonic GUI to control Panasonic Aquarea air-water pump ( not tested with latest Heishamon, it was just mock up for phyton learning)
 
 Its add-on for current project https://github.com/Egyras/HeishaMon and for people without any home automation system. All values retrieve and heat pump control are done via json functionality in HeishaMon. Application read all data in default 6 second interval and shows in GUI. HeishaMon IP address must be entered in "Settings" page and saved, after re-launch values will apear in GUI. Minimal heat pump control available and will be extended in near future. 
 Main.exe is executable file, no viruses, no malware in it.
